@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaberX | Admin Girişi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-200 h-screen flex items-center justify-center">
+
+    <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+        <h2 class="text-3xl font-extrabold text-center text-blue-900 mb-6">Haber<span class="text-red-600">X</span> Admin</h2>
+        
+        <!-- Hata mesajı kutusu (Başlangıçta gizli) -->
+        <div id="hata-mesaji" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm text-center"></div>
+
+        <form id="login-form">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2">Kullanıcı Adı</label>
+                <input type="text" id="kadi" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 font-bold mb-2">Şifre</label>
+                <input type="password" id="sifre" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600" required>
+            </div>
+            <button type="submit" class="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                Giriş Yap
+            </button>
+        </form>
+        <a href="index.html" class="block text-center mt-4 text-sm text-gray-500 hover:text-gray-800">&larr; Ana Sayfaya Dön</a>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Sayfanın yenilenmesini engelle
+            
+            const kadi = document.getElementById('kadi').value;
+            const sifre = document.getElementById('sifre').value;
+            const hataKutusu = document.getElementById('hata-mesaji');
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kadi, sifre })
+                });
+
+                const data = await response.json();
+
+                if (data.basarili) {
+                    // Şifre doğruysa admin paneline yönlendir
+                    window.location.href = '/admin.html';
+                } else {
+                    // Şifre yanlışsa hatayı göster
+                    hataKutusu.innerText = data.mesaj;
+                    hataKutusu.classList.remove('hidden');
+                }
+            } catch (error) {
+                hataKutusu.innerText = "Sunucuya bağlanılamadı!";
+                hataKutusu.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

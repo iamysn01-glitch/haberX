@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaberX | Türkiye'nin En Güncel Haber Sitesi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Hover efektleri için küçük dokunuşlar */
+        .hover-zoom:hover img { transform: scale(1.05); }
+        .transition-all { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- ÜST BİLGİ VE SON DAKİKA BANTI -->
+    <div class="bg-red-600 text-white text-sm py-2">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold bg-white text-red-600 px-2 py-1 rounded animate-pulse">SON DAKİKA</span>
+                <marquee class="w-64 md:w-96 text-sm" scrollamount="5">Merkez Bankası faiz kararını açıkladı... İstanbul'da sağanak yağış uyarısı...</marquee>
+            </div>
+            <div class="hidden md:block text-xs">
+                Tarih: <span id="current-date"></span> | Saat: <span id="current-time" class="font-bold text-yellow-300"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER / MENÜ -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="index.html" class="text-3xl font-extrabold text-blue-900 tracking-tight">Haber<span class="text-red-600">X</span></a>
+            
+            <!-- KATEGORİLER (Linkleri eklendi) -->
+            <nav class="hidden md:flex space-x-6 font-semibold text-gray-700">
+                <a href="index.html?kategori=Gündem" class="hover:text-red-600 transition-all">Gündem</a>
+                <a href="index.html?kategori=Ekonomi" class="hover:text-red-600 transition-all">Ekonomi</a>
+                <a href="index.html?kategori=Spor" class="hover:text-red-600 transition-all">Spor</a>
+                <a href="index.html?kategori=Teknoloji" class="hover:text-red-600 transition-all">Teknoloji</a>
+                <a href="index.html?kategori=Dünya" class="hover:text-red-600 transition-all">Dünya</a>
+            </nav>
+
+            <!-- ARAMA KUTUSU (id'ler eklendi) -->
+            <div class="hidden lg:flex items-center bg-gray-100 rounded-full px-3 py-1">
+                <input type="text" id="search-input" placeholder="Haberlerde ara..." class="bg-transparent outline-none text-sm p-1">
+                <button id="search-btn" class="text-gray-500 hover:text-red-600 px-2">🔍</button>
+            </div>
+
+            <!-- Mobil Menü İkonu -->
+            <button class="md:hidden text-gray-700 text-2xl">☰</button>
+        </div>
+    </header>
+
+    <!-- ANA İÇERİK ALANI -->
+    <main class="container mx-auto px-4 py-6">
+        
+        <!-- MANŞET HABERLERİ (id="manset-alani" eklendi) -->
+        <section id="manset-alani" class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+            <div id="main-headline" class="lg:col-span-2"></div>
+            <div id="side-headlines" class="flex flex-col gap-4"></div>
+        </section>
+
+        <!-- DİĞER HABERLER (GRID) -->
+        <!-- Başlık dinamik yapıldı -->
+        <h3 id="liste-basligi" class="text-2xl font-bold border-b-2 border-red-600 inline-block pb-1 mb-6 uppercase">Günün Gelişmeleri</h3>
+        <section id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></section>
+        
+    </main>
+
+    <!-- FOOTER (Senin orijinal ayarların korundu) -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+            <div>
+                <h3 class="text-2xl font-extrabold mb-4">Haber<span class="text-red-500">X</span></h3>
+                <p class="text-gray-400">Türkiye'nin en tarafsız ve en hızlı haber kaynağı. Gerçekleri anında öğrenin.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4">Hızlı Bağlantılar</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white">Künye</a></li>
+                    <li><a href="#" class="hover:text-white">İletişim</a></li>
+                    <li><a href="#" class="hover:text-white">Gizlilik Politikası</a></li>
+                    <li><a href="#" class="hover:text-white">Reklam Verin</a></li>
+                    <li><a href="http://localhost:3000/login.html" class="hover:text-white" target="_blank">Giriş Yap</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4">Bizi Takip Edin</h4>
+                <div class="flex space-x-4">
+                    <a href="" class="bg-blue-600 px-3 py-2 rounded hover:bg-blue-700 transition-colors">Facebook</a>
+                    <a href="#" class="bg-blue-400 px-3 py-2 rounded hover:bg-blue-500 transition-colors">Twitter</a>
+                    <a href="https://www.instagram.com/_mhmd_ari34" class="bg-pink-600 px-3 py-2 rounded hover:bg-pink-700 transition-colors" target="_blank">Instagram</a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-gray-500 mt-8 text-xs border-t border-gray-700 pt-4">
+            &copy; 2026 HaberX. Tüm hakları saklıdır. Yazılım ve Tasarım.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT: SAAT, TARİH VE HABERLER -->
+    <script>
+        // 1. TARIH VE CANLI SAAT
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('tr-TR', dateOptions);
+
+        function updateClock() {
+            const now = new Date();
+            const timeEl = document.getElementById('current-time');
+            if(timeEl) {
+                timeEl.innerText = now.toLocaleTimeString('tr-TR', { 
+                    hour: '2-digit', minute: '2-digit', second: '2-digit' 
+                });
+            }
+        }
+        updateClock(); 
+        setInterval(updateClock, 1000); 
+
+        // ==========================================
+        // YENİ: ARAMA İŞLEMİNİ TETİKLEYEN KODLAR
+        // ==========================================
+        function aramaYap() {
+            const kelime = document.getElementById('search-input').value.trim();
+            if (kelime) {
+                // Arama kelimesini adrese ekle ve sayfayı yenile
+                window.location.href = 'index.html?arama=' + encodeURIComponent(kelime);
+            }
+        }
+        
+        // Büyütece tıklanınca ara
+        document.getElementById('search-btn').addEventListener('click', aramaYap);
+        
+        // Kutudayken Enter'a basılınca ara
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') aramaYap();
+        });
+
+
+        // 2. HABERLERİ ÇEKME VE FİLTRELEME
+        let currentNewsData = ""; 
+
+        async function loadNews() {
+            try {
+                // Adresteki "kategori" veya "arama" kelimesini yakala
+                const urlParams = new URLSearchParams(window.location.search);
+                const seciliKategori = urlParams.get('kategori');
+                const arananKelime = urlParams.get('arama');
+
+                const mansetAlani = document.getElementById('manset-alani');
+                const listeBasligi = document.getElementById('liste-basligi');
+
+                // Kategori veya arama varsa manşetleri gizle, başlığı değiştir
+                if (seciliKategori) {
+                    mansetAlani.style.display = 'none';
+                    listeBasligi.innerText = seciliKategori + " HABERLERİ";
+                    document.title = "HaberX | " + seciliKategori;
+                } else if (arananKelime) {
+                    mansetAlani.style.display = 'none';
+                    listeBasligi.innerText = '"' + arananKelime + '" İÇİN ARAMA SONUÇLARI';
+                    document.title = "HaberX | Arama Sonuçları";
+                } else {
+                    mansetAlani.style.display = 'grid'; // Ana sayfadaysak manşetleri göster
+                    listeBasligi.innerText = "Günün Gelişmeleri";
+                }
+
+                // Veritabanından tüm haberleri çek
+                const response = await fetch('/api/news');
+                const data = await response.json();
+                
+                const newDataString = JSON.stringify(data.news);
+                if (newDataString === currentNewsData) return; 
+                
+                currentNewsData = newDataString;
+                let newsList = data.news;
+
+                // FİLTRELEME İŞLEMİ
+                if (seciliKategori) {
+                    // Sadece o kategoridekileri bırak
+                    newsList = newsList.filter(n => n.category.toLowerCase() === seciliKategori.toLowerCase());
+                } else if (arananKelime) {
+                    // Başlığında veya özetinde o kelime geçenleri bırak
+                    const kelime = arananKelime.toLowerCase();
+                    newsList = newsList.filter(n => 
+                        n.title.toLowerCase().includes(kelime) || 
+                        n.summary.toLowerCase().includes(kelime)
+                    );
+                }
+
+                const mainHeadlineContainer = document.getElementById('main-headline');
+                const sideHeadlinesContainer = document.getElementById('side-headlines');
+                const gridContainer = document.getElementById('news-grid');
+
+                mainHeadlineContainer.innerHTML = '';
+                sideHeadlinesContainer.innerHTML = '';
+                gridContainer.innerHTML = '';
+
+                // Eğer hiç haber bulunamadıysa:
+                if (newsList.length === 0) {
+                    gridContainer.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500 text-lg font-bold">Aradığınız kritere uygun haber bulunamadı.</div>';
+                    return;
+                }
+
+                // Ekrana basma
+                newsList.forEach(news => {
+                    // Eğer bir filtreleme (kategori veya arama) varsa, manşet ayrımı yapmadan hepsini kutu olarak diz
+                    if (!seciliKategori && !arananKelime && news.type === 'manset') {
+                        mainHeadlineContainer.innerHTML = `
+                            <a href="haber.html?id=${news.id}" class="relative group block overflow-hidden rounded-lg shadow-lg hover-zoom h-full">
+                                <img src="${news.image_url}" class="w-full h-80 lg:h-96 object-cover transition-all duration-500">
+                                <div class="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent p-6">
+                                    <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">${news.category}</span>
+                                    <h2 class="text-white text-2xl lg:text-3xl font-bold mt-2 group-hover:underline">${news.title}</h2>
+                                </div>
+                            </a>
+                        `;
+                    } else if (!seciliKategori && !arananKelime && news.type === 'yan_manset') {
+                        sideHeadlinesContainer.innerHTML += `
+                            <a href="haber.html?id=${news.id}" class="relative group block overflow-hidden rounded-lg shadow-lg hover-zoom h-40 lg:h-[11.5rem]">
+                                <img src="${news.image_url}" class="w-full h-full object-cover transition-all duration-500">
+                                <div class="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent p-4">
+                                    <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">${news.category}</span>
+                                    <h3 class="text-white text-md font-bold mt-1">${news.title}</h3>
+                                </div>
+                            </a>
+                        `;
+                    } else {
+                        // Kategori sayfasındaysak veya arama yapılmışsa hepsi bu şekilde kutu (grid) olarak görünür
+                        gridContainer.innerHTML += `
+                            <a href="haber.html?id=${news.id}" class="bg-white block rounded-lg shadow hover:shadow-xl transition-all overflow-hidden flex flex-col h-full">
+                                <div class="overflow-hidden h-40 flex-shrink-0">
+                                    <img src="${news.image_url}" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-300">
+                                </div>
+                                <div class="p-4 flex-grow flex flex-col">
+                                    <span class="text-red-600 text-xs font-bold uppercase mb-1">${news.category}</span>
+                                    <h4 class="font-bold text-lg leading-tight mb-2 group-hover:text-red-600">${news.title}</h4>
+                                    <p class="text-gray-600 text-sm line-clamp-2 mt-auto">${news.summary}</p>
+                                </div>
+                            </a>
+                        `;
+                    }
+                });
+            } catch (error) {
+                console.error("Haberler yüklenirken bir hata oluştu:", error);
+            }
+        }
+
+        loadNews(); 
+        setInterval(loadNews, 5000); 
+    </script>
+</body>
+</html>

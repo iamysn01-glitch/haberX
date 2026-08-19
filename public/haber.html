@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaberX | Haber Detayı</title>
+    <!-- YENİ: Typography eklentisi editörden gelen HTML'i muazzam şık gösterir -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- HEADER / ÜST MENÜ -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-extrabold text-blue-900 tracking-tight">Haber<span class="text-red-600">X</span></a>
+            <a href="index.html" class="bg-gray-800 text-white px-4 py-2 rounded font-bold hover:bg-black transition-colors text-sm">
+                &larr; Ana Sayfa
+            </a>
+        </div>
+    </header>
+
+    <!-- HABER DETAY ALANI -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl" id="news-detail-container">
+        <!-- Haber Yüklenirken Görünecek Kısım -->
+        <div class="text-center py-20">
+            <span class="text-xl text-gray-500 animate-pulse">Haber yükleniyor...</span>
+        </div>
+    </main>
+
+    <script>
+        async function loadNewsDetail() {
+            // 1. Adres çubuğundaki ID'yi yakala
+            const urlParams = new URLSearchParams(window.location.search);
+            const newsId = urlParams.get('id');
+            const container = document.getElementById('news-detail-container');
+
+            if (!newsId) {
+                container.innerHTML = '<h1 class="text-2xl text-center text-red-600 font-bold py-20">Hata: Haber bulunamadı!</h1>';
+                return;
+            }
+
+            try {
+                // 2. Veritabanından haberi çek
+                const response = await fetch(`/api/news/${newsId}`);
+                if (!response.ok) throw new Error('Haber bulunamadı');
+                const news = await response.json();
+
+                // Paylaşım Butonları için Mevcut Linki Al
+                const currentUrl = encodeURIComponent(window.location.href);
+                const shareTitle = encodeURIComponent(news.title);
+
+                // 3. Haberi Ekrana Bas
+                container.innerHTML = `
+                    <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded uppercase shadow-sm">${news.category}</span>
+                    <h1 class="text-3xl md:text-5xl font-extrabold mt-4 mb-6 text-gray-900 leading-tight">${news.title}</h1>
+                    
+                    <!-- YENİ: PAYLAŞIM BUTONLARI -->
+                    <div class="flex space-x-3 mb-6 border-b border-gray-300 pb-4">
+                        <a href="https://api.whatsapp.com/send?text=${shareTitle}%20-%20${currentUrl}" target="_blank" class="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-600 transition shadow-sm">
+                            📱 WhatsApp
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?text=${shareTitle}&url=${currentUrl}" target="_blank" class="flex items-center bg-blue-400 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-500 transition shadow-sm">
+                            🐦 X (Twitter)
+                        </a>
+                    </div>
+
+                    <img src="${news.image_url}" alt="${news.title}" class="w-full rounded-xl shadow-xl mb-8 object-cover max-h-[500px]">
+                    
+                    <!-- YENİ: İÇERİK KISMI ("prose" class'ı yazıları dergi formuna sokar) -->
+                    <div class="bg-white p-8 md:p-12 rounded-xl shadow-md">
+                        <div class="prose prose-lg max-w-none text-gray-800">
+                            ${news.summary}
+                        </div>
+                    </div>
+                `;
+                
+                // Sekme başlığını haberin başlığı yap
+                document.title = news.title + " | HaberX";
+                
+            } catch (error) {
+                container.innerHTML = '<h1 class="text-2xl text-center text-red-600 font-bold py-20">Bu haber silinmiş veya artık ulaşılamıyor.</h1>';
+            }
+        }
+
+        loadNewsDetail();
+    </script>
+</body>
+</html>
