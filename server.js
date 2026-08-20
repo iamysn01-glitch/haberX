@@ -1,22 +1,23 @@
-require('dotenv').config(); // Şifre kasamızı ( .env ) aktif eder
+require('dotenv').config(); // Sifre kasamizi ( .env ) aktif eder
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
-const mongoose = require('mongoose'); // Bulut Veritabanı
+const mongoose = require('mongoose'); // Bulut Veritabani
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('cloudinary').v2; // Bulut Fotoğraf
+const cloudinary = require('cloudinary').v2; // Bulut Fotograf
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // --- 1. MONGODB BAGLANTISI ---
-mongoose.connect(process.env.MONGO_URI, { family: 4 })
+// DIKKAT: Sifreni asagida KENDISIFRENIYAZ yazan yere tirnaklari silmeden yaz!
+mongoose.connect("mongodb+srv://iamysn01_db_user:Mami0234.@cluster0.9o3cjou.mongodb.net/haberx?appName=Cluster0", { family: 4 })
   .then(() => console.log("? MongoDB Bulut Veritabanina Basariyla Baglanildi!"))
   .catch(err => console.error("? MongoDB Baglanti Hatasi:", err));
 
-// Veritabanı Haber Şablonu
+// Veritabani Haber Sablonu
 const newsSchema = new mongoose.Schema({
     title: String,
     category: String,
@@ -51,7 +52,7 @@ app.use(session({
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Admin Paneli Koruması
+// Admin Paneli Korumasi
 app.use('/admin.html', (req, res, next) => {
     if (req.session && req.session.girisYapildi) next(); 
     else res.redirect('/login.html'); 
@@ -59,36 +60,36 @@ app.use('/admin.html', (req, res, next) => {
 
 function yetkiKontrolu(req, res, next) {
     if (req.session && req.session.girisYapildi) next();
-    else res.status(401).json({ error: "Giriş yapmalısınız." });
+    else res.status(401).json({ error: "Giris yapmalisiniz." });
 }
 
-// --- 4. API (İLETİŞİM) KODLARI ---
+// --- 4. API (ILETISIM) KODLARI ---
 
-// Giriş Yapma (Login)
+// Giris Yapma (Login)
 app.post('/api/login', (req, res) => {
     if (req.body.kadi === 'admin' && req.body.sifre === '12345') {
         req.session.girisYapildi = true;
         res.json({ basarili: true });
-    } else res.status(401).json({ basarili: false, mesaj: "Hatalı giriş!" });
+    } else res.status(401).json({ basarili: false, mesaj: "Hatali giris!" });
 });
 
-// Çıkış Yapma (Logout)
+// �ikis Yapma (Logout)
 app.post('/api/logout', (req, res) => {
     req.session.destroy();
     res.json({ basarili: true });
 });
 
-// Fotoğraf Yükleme (Artık Cloudinary'e yükleniyor)
+// Fotograf Y�kleme (Artik Cloudinary'e y�kleniyor)
 app.post('/api/upload', yetkiKontrolu, upload.single('image'), (req, res) => {
-    if (!req.file) return res.status(400).json({ error: "Lütfen fotoğraf seçin." });
+    if (!req.file) return res.status(400).json({ error: "L�tfen fotograf se�in." });
     res.json({ imageUrl: req.file.path }); 
 });
 
-// Tüm Haberleri Getirme
+// T�m Haberleri Getirme
 app.get('/api/news', async (req, res) => {
     try {
         const news = await News.find().sort({ _id: -1 });
-        // Eski sisteme uyması için _id'yi id yapıyoruz
+        // Eski sisteme uymasi i�in _id'yi id yapiyoruz
         const formattedNews = news.map(n => ({ 
             id: n._id, title: n.title, category: n.category, 
             summary: n.summary, image_url: n.image_url, type: n.type 
@@ -105,7 +106,7 @@ app.get('/api/news/:id', async (req, res) => {
             id: n._id, title: n.title, category: n.category, 
             summary: n.summary, image_url: n.image_url, type: n.type 
         });
-    } catch (err) { res.status(404).json({ error: "Haber bulunamadı" }); }
+    } catch (err) { res.status(404).json({ error: "Haber bulunamadi" }); }
 });
 
 // Yeni Haber Ekleme
@@ -113,7 +114,7 @@ app.post('/api/news', yetkiKontrolu, async (req, res) => {
     try {
         const yeniHaber = new News(req.body);
         await yeniHaber.save();
-        res.json({ message: "Haber başarıyla eklendi!", id: yeniHaber._id });
+        res.json({ message: "Haber basariyla eklendi!", id: yeniHaber._id });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -125,13 +126,13 @@ app.delete('/api/news/:id', yetkiKontrolu, async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Haber Güncelleme
+// Haber G�ncelleme
 app.put('/api/news/:id', yetkiKontrolu, async (req, res) => {
     try {
         await News.findByIdAndUpdate(req.params.id, req.body);
-        res.json({ message: "Haber güncellendi!" });
+        res.json({ message: "Haber g�ncellendi!" });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Sunucuyu Başlat
-app.listen(port, () => console.log(`🚀 Sunucu çalışıyor: http://localhost:${port}`));
+// Sunucuyu Baslat
+app.listen(port, () => console.log(`?? Sunucu �alisiyor: http://localhost:${port}`));
