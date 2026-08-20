@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaberX | Yönetim Paneli</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Quill.js CSS (Tasarım) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    
+    <style>
+        .ql-editor { min-height: 200px; font-size: 16px; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- ADMIN HEADER / MENÜ -->
+    <header class="bg-white shadow-md sticky top-0 z-50 mb-8">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-3xl font-extrabold text-blue-900 tracking-tight flex items-center">
+                Haber<span class="text-red-600">X</span> 
+                <span class="text-gray-400 text-xl font-medium ml-3 border-l-2 border-gray-300 pl-3">Yönetim Paneli</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="index.html" target="_blank" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-lg font-bold transition-colors text-sm flex items-center shadow-sm">
+                    🌍 Siteyi Gör
+                </a>
+                <button id="logout-btn" class="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-lg font-bold transition-colors text-sm flex items-center shadow-sm">
+                    Güvenli Çıkış
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ANA İÇERİK KISMI -->
+    <div class="max-w-4xl mx-auto px-4">
+        
+        <!-- HABER EKLEME / DÜZENLEME FORMU -->
+        <div class="bg-white p-8 rounded-lg shadow-md mb-8">
+            <h2 id="formTitle" class="text-2xl font-bold mb-6 border-b pb-2">Yeni Haber Ekle</h2>
+            <form id="newsForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Haber Başlığı</label>
+                    <input type="text" id="title" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-red-500">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                        <input type="text" id="category" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Haber Türü</label>
+                        <select id="type" class="w-full border border-gray-300 rounded-md p-2 focus:ring-red-500">
+                            <option value="normal">Normal Haber (Grid)</option>
+                            <option value="manset">Ana Manşet (Büyük)</option>
+                            <option value="yan_manset">Yan Manşet (Küçük)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- FOTOĞRAF SEÇME ALANI -->
+                <div class="bg-gray-50 p-4 border border-gray-200 rounded-md">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">📸 Bilgisayardan Fotoğraf Seç</label>
+                    <input type="file" id="image_file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer">
+                    
+                    <p id="current_image_text" class="text-sm text-gray-500 mt-2 hidden">
+                        Mevcut Fotoğraf: <a href="#" target="_blank" id="current_image_link" class="text-blue-600 font-bold hover:underline">Görüntüle</a> (Değiştirmeyecekseniz yeni fotoğraf seçmeyin)
+                    </p>
+                    <input type="hidden" id="image_url">
+                </div>
+
+                <!-- GELİŞMİŞ METİN EDİTÖRÜ (Quill) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📰 Haber İçeriği (Gelişmiş Editör)</label>
+                    <div id="editor-container" class="bg-white rounded-b-md"></div>
+                    <input type="hidden" id="summary">
+                </div>
+                
+                <div class="flex gap-4 pt-2">
+                    <button type="submit" id="submitBtn" class="flex-1 bg-red-600 text-white font-bold py-3 px-4 rounded hover:bg-red-700 transition-colors shadow-md">
+                        Haberi Yayınla
+                    </button>
+                    <button type="button" id="cancelBtn" onclick="resetForm()" class="hidden flex-1 bg-gray-500 text-white font-bold py-3 px-4 rounded hover:bg-gray-600 transition-colors shadow-md">
+                        İptal
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- HABER LİSTESİ TABLOSU -->
+        <div class="bg-white p-8 rounded-lg shadow-md mb-20">
+            <h2 class="text-xl font-bold mb-4 border-b pb-2">Eklenen Haberleri Yönet</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 rounded-l-lg">Başlık</th>
+                            <th class="px-6 py-3">Kategori</th>
+                            <th class="px-6 py-3 text-center rounded-r-lg">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="newsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Quill.js Kütüphanesi -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <script>
+        let allNews = [];
+        let editingId = null;
+
+        // QUILL EDİTÖRÜNÜ BAŞLAT
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Haberin tüm detaylarını buraya yazın...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'video'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Tabloyu Doldur
+        async function loadAdminNews() {
+            try {
+                const res = await fetch('/api/news');
+                const data = await res.json();
+                allNews = data.news;
+                
+                const tbody = document.getElementById('newsTableBody');
+                tbody.innerHTML = '';
+                
+                allNews.news.forEach(news => {
+                    tbody.innerHTML += `
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-900 line-clamp-2">${news.title}</td>
+                            <td class="px-6 py-4">${news.category}</td>
+                            <td class="px-6 py-4 text-center space-x-2 min-w-[150px]">
+                                <button onclick="editNews(${news.id})" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded">Düzenle</button>
+                                <button onclick="deleteNews(${news.id})" class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded">Sil</button>
+                            </td>
+                        </tr>
+                      ;
+                });
+            } catch (error) {
+                console.error("Haberler yüklenemedi:", error);
+            }
+        }
+
+        // HABER VE FOTOĞRAF GÖNDERME
+        document.getElementById('newsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const editorContent = document.querySelector('.ql-editor').innerHTML;
+            
+            if (editorContent === '<p><br></p>') {
+                alert("Lütfen haber içeriğini boş bırakmayın!");
+                return;
+            }
+
+            let finalImageUrl = document.getElementById('image_url').value;
+            const imageFile = document.getElementById('image_file').files[0];
+
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+
+                try {
+                    const uploadRes = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const uploadData = await uploadRes.json();
+                    
+                    if (uploadRes.ok) {
+                        finalImageUrl = uploadData.imageUrl; 
+                    } else {
+                        alert("Fotoğraf yüklenemedi: " + uploadData.error);
+                        return; 
+                    }
+                } catch (err) {
+                    alert("Fotoğraf sunucuya gönderilemedi!");
+                    return;
+                }
+            } else if (!finalImageUrl && !editingId) {
+                alert("Lütfen haber için bir fotoğraf seçin!");
+                return;
+            }
+
+            const data = {
+                title: document.getElementById('title').value,
+                category: document.getElementById('category').value,
+                type: document.getElementById('type').value,
+                image_url: finalImageUrl,
+                summary: editorContent 
+            };
+
+            const url = editingId ? `/api/news/${editingId}` : '/api/news';
+            const method = editingId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if(response.ok) {
+                    alert(editingId ? 'Haber güncellendi!' : 'Haber başarıyla eklendi!');
+                    resetForm();
+                    loadAdminNews();
+                } else {
+                    alert('Haber kaydedilirken bir hata oluştu!');
+                }
+            } catch (error) {
+                alert('Sunucuya bağlanılamadı!');
+            }
+        });
+
+        // SİL
+        async function deleteNews(id) {
+            if(!confirm('Bu haberi silmek istediğinize emin misiniz?')) return;
+            try {
+                const response = await fetch(`/api/news/${id}`, { method: 'DELETE' });
+                if(response.ok) loadAdminNews(); 
+            } catch (error) { alert('Haber silinemedi!'); }
+        }
+
+        // DÜZENLE
+        function editNews(id) {
+            const news = allNews.find(n => n.id === id);
+            if(!news) return;
+            
+            document.getElementById('title').value = news.title;
+            document.getElementById('category').value = news.category;
+            document.getElementById('type').value = news.type;
+            
+            quill.clipboard.dangerouslyPasteHTML(news.summary);
+            
+            document.getElementById('image_url').value = news.image_url;
+            document.getElementById('current_image_link').href = news.image_url;
+            document.getElementById('current_image_text').classList.remove('hidden');
+            
+            editingId = id; 
+            document.getElementById('formTitle').innerText = "Haberi Düzenle";
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Değişiklikleri Kaydet";
+            btn.classList.replace('bg-red-600', 'bg-green-600');
+            btn.classList.replace('hover:bg-red-700', 'hover:bg-green-700');
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        // SIFIRLA
+        function resetForm() {
+            document.getElementById('newsForm').reset();
+            editingId = null;
+            document.getElementById('image_url').value = '';
+            document.getElementById('current_image_text').classList.add('hidden');
+            
+            quill.setContents([]);
+            
+            document.getElementById('formTitle').innerText = "Yeni Haber Ekle";
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Haberi Yayınla";
+            btn.classList.replace('bg-green-600', 'bg-red-600');
+            btn.classList.replace('hover:bg-green-700', 'hover:bg-red-700');
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        // ÇIKIŞ YAP
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            if (confirm("Çıkış yapmak istediğinize emin misiniz?")) {
+                try {
+                    const response = await fetch('/api/logout', { method: 'POST' });
+                    const data = await response.json();
+                    if (data.basarili) window.location.href = '/login.html';
+                } catch (error) { alert("Çıkış yapılırken bir hata oluştu!"); }
+            }
+        });
+
+        loadAdminNews();
+    </script>
+</body>
+</html>
