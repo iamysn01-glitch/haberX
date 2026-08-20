@@ -11,10 +11,10 @@ const cloudinary = require('cloudinary').v2; // Bulut Fotoğraf
 const app = express();
 const port = process.env.PORT || 3000;
 
-// --- 1. MONGODB BAĞLANTISI ---
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Bulut Veritabanına Başarıyla Bağlanıldı!"))
-  .catch(err => console.error("❌ MongoDB Bağlantı Hatası:", err));
+// --- 1. MONGODB BAGLANTISI ---
+mongoose.connect(process.env.MONGO_URI, { family: 4 })
+  .then(() => console.log("? MongoDB Bulut Veritabanina Basariyla Baglanildi!"))
+  .catch(err => console.error("? MongoDB Baglanti Hatasi:", err));
 
 // Veritabanı Haber Şablonu
 const newsSchema = new mongoose.Schema({
